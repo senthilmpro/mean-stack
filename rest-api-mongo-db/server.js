@@ -5,6 +5,9 @@
 
 // call the packages we need
 var express = require('express');        // call express
+var http = require('http');
+var fs = require('fs');
+var https = require('https');
 var app = express();                 // define our app using express
 var bodyParser = require('body-parser');
 
@@ -14,16 +17,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 var port = process.env.PORT || 5555;        // set our port
+var sslOptions = {
+    key: fs.readFileSync('key.pem'),
+    cert: fs.readFileSync('cert.pem')
+};
 
 // ROUTES FOR OUR API
 // =============================================================================
 var router = express.Router();              // get an instance of the express Router
 var Bear = require('./app/models/bear');
 
+var TModel = require('./app/models/tin');
+var TRawModel = require('./app/models/tinraw');
+
 // middleware to use for all requests
 router.use(function (req, res, next) {
     // do logging
     console.log('Something is happening.');
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
     next(); // make sure we go to the next routes and don't stop here
 });
 
@@ -32,6 +45,42 @@ router.use(function (req, res, next) {
 router.get('/', function (req, res) {
     res.json({ message: 'hooray! welcome to our api!' });
 });
+
+router.route('/tin')
+    .post(function(req, res){
+        var tModel = new TModel();
+        tModel.name = req.body.name;
+        tModel.info = req.body.info;
+        tModel.bio = req.body.bio;
+        tModel.pics = req.body.pics;
+
+        tModel.save(function(err){
+            if(err){
+                res.send(err);
+            }
+            res.json({
+                "message" : "created"
+            })
+        })
+    });
+
+    router.route('/tinraw')
+    .post(function(req, res){
+        var tModel = new TRawModel();
+        tModel.name = req.body.name;
+        tModel.info = req.body.info;
+        tModel.bio = req.body.bio;
+        tModel.pics = req.body.pics;
+        tModel.obj = req.body.obj;
+        tModel.save(function(err){
+            if(err){
+                res.send(err);
+            }
+            res.json({
+                "message" : "created"
+            })
+        })
+    });
 
 // more routes for our API will happen here
 router.route('/bears')
@@ -113,8 +162,14 @@ app.get('/home', function (req, res) {
     res.send("Welcome");
 });
 
+var credentials = {
+    key: fs.readFileSync('key.pem', 'utf8'),
+    cert: fs.readFileSync('cert.pem', 'utf8'),
+    passphrase: 'softwares'
+}
 
 // START THE SERVER
 // =============================================================================
-app.listen(port);
+https.createServer(credentials, app).listen(port);
+
 console.log('Magic happens on port ' + port);
