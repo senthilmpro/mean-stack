@@ -10,4 +10,4 @@ var TSchema = new Schema({
     pics :  [Schema.Types.Mixed]
 });
 
-module.exports = mongoose.model('Tin', TSchema);
+module.exports = mongoose.model('Tin2', TSchema);

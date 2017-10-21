@@ -49,19 +49,38 @@ router.get('/', function (req, res) {
 router.route('/tin')
     .post(function(req, res){
         var tModel = new TModel();
-        tModel.name = req.body.name;
-        tModel.info = req.body.info;
-        tModel.bio = req.body.bio;
-        tModel.pics = req.body.pics;
-
-        tModel.save(function(err){
-            if(err){
-                res.send(err);
-            }
-            res.json({
-                "message" : "created"
-            })
-        })
+        //console.log(req.body);
+        try {
+            tModel.name = req.body.name;
+            tModel.info = req.body.info;
+            tModel.bio = req.body.bio;
+            tModel.pics = req.body.pics;
+    
+            //console.log(JSON.stringify(tModel));
+    
+            tModel.save(function (err) {
+                if (err) {
+                    res.send(err);
+                }
+                res.json({
+                    "message": "created"
+                })
+            });
+    
+            // tModel.save((err, appt) => {
+            //     console.log("CALLED")
+            //     if (err) {
+            //       return next(err);
+            //     }
+            
+            //     res.json(appt);
+            //   });
+        } catch(ex){
+            console.log("ERROR : ", ex)
+        }
+        
+    }).get(function(req,res){
+        res.json({"message": "welcome to tin api"})
     });
 
     router.route('/tinraw')
@@ -72,6 +91,7 @@ router.route('/tin')
         tModel.bio = req.body.bio;
         tModel.pics = req.body.pics;
         tModel.obj = req.body.obj;
+    
         tModel.save(function(err){
             if(err){
                 res.send(err);
@@ -80,7 +100,9 @@ router.route('/tin')
                 "message" : "created"
             })
         })
-    });
+    }).get(function(req,res){
+        res.json({"message": "welcome to tinraw api"})
+    });;
 
 // more routes for our API will happen here
 router.route('/bears')

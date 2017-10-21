@@ -11,4 +11,4 @@ var TRawSchema = new Schema({
     obj : Schema.Types.Mixed
 });
 
-module.exports = mongoose.model('Tinraw', TRawSchema);
+module.exports = mongoose.model('Tinraw2', TRawSchema);
